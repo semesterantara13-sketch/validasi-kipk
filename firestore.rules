@@ -1,0 +1,74 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Master Gate: Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == "juragangeprek40@gmail.com"
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validation for Registration
+    function isValidRegistration(data) {
+      return data.keys().hasAll([
+        'noPendaftaran', 'nim', 'nama', 'nik', 'nisn', 'npsn', 
+        'perguruanTinggi', 'prodi', 'email', 'createdAt'
+      ]) &&
+      data.keys().size() == 10 &&
+      data.noPendaftaran is string && data.noPendaftaran.matches('^[0-9]{4}\\.[0-9]{3}\\.[0-9]{5}\\.[0-9]{4}\\.[0-9]{3}$') &&
+      data.nim is string && data.nim.size() > 0 && data.nim.size() <= 50 &&
+      data.nama is string && data.nama.size() > 0 && data.nama.size() <= 100 &&
+      data.nik is string && data.nik.matches('^[0-9]{16}$') &&
+      data.nisn is string && data.nisn.matches('^[0-9]{10}$') &&
+      data.npsn is string && data.npsn.matches('^[0-9]{8}$') &&
+      data.perguruanTinggi == "UNIVERSITAS KOMPUTAMA" &&
+      data.prodi in [
+        "SISTEM INFORMASI", "TEKNIK INFORMATIKA", "TEKNOLOGI INFORMASI", 
+        "PENDIDIKAN MATEMATIKA", "BISNIS DIGITAL"
+      ] &&
+      data.email is string && data.email.size() > 0 && data.email.size() <= 100 &&
+      data.createdAt == request.time;
+    }
+
+    // Registrations Collection
+    match /registrations/{registrationId} {
+      allow create: if isValidRegistration(incoming());
+      allow read: if isAdmin();
+      // No updates or deletes allowed for data integrity as per "Terminal State Locking" or similar logic
+      // unless admin needs to fix something.
+      allow delete: if isAdmin();
+    }
+
+    // Admins Collection
+    match /admins/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

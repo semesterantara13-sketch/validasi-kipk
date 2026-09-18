@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "Registration": {
+      "title": "Registration",
+      "description": "KIPK Registration Data",
+      "type": "object",
+      "properties": {
+        "noPendaftaran": {
+          "type": "string",
+          "description": "Nomor Pendaftaran KIPK",
+          "pattern": "^[0-9]{4}\\.[0-9]{3}\\.[0-9]{5}\\.[0-9]{4}\\.[0-9]{3}$"
+        },
+        "nim": {
+          "type": "string",
+          "description": "NIM",
+          "minLength": 1,
+          "maxLength": 50
+        },
+        "nama": {
+          "type": "string",
+          "description": "Nama Lengkap",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "nik": {
+          "type": "string",
+          "description": "NIK KTP (16 Angka)",
+          "pattern": "^[0-9]{16}$"
+        },
+        "nisn": {
+          "type": "string",
+          "description": "NISN (10 Angka)",
+          "pattern": "^[0-9]{10}$"
+        },
+        "npsn": {
+          "type": "string",
+          "description": "NPSN (8 Angka)",
+          "pattern": "^[0-9]{8}$"
+        },
+        "perguruanTinggi": {
+          "type": "string",
+          "description": "Perguruan Tinggi",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "prodi": {
+          "type": "string",
+          "description": "Program Studi",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "email": {
+          "type": "string",
+          "description": "Email Akun KIPK",
+          "format": "email"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "noPendaftaran",
+        "nim",
+        "nama",
+        "nik",
+        "nisn",
+        "npsn",
+        "perguruanTinggi",
+        "prodi",
+        "email",
+        "createdAt"
+      ]
+    },
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized Admin Users",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        }
+      },
+      "required": ["email"]
+    }
+  },
+  "firestore": {
+    "/registrations/{registrationId}": {
+      "schema": "Registration",
+      "description": "Collection of student registrations"
+    },
+    "/admins/{userId}": {
+      "schema": "Admin",
+      "description": "Collection of authorized admin UIDs"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Sistem Pendaftaran KIPK",
+  "description": "Website pengisian form pendaftaran KIPK dengan validasi data, dashboard admin real-time, dan fitur ekspor Excel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
